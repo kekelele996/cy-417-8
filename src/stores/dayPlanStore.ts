@@ -15,8 +15,9 @@ export const useDayPlanStore = defineStore('dayPlan', {
       }
       return day;
     },
-    addSpot(tripId: string, spotId: string, dayIndex = 1) {
-      const day = this.ensureDay(tripId, dayIndex);
+    addSpot(tripId: string, spotId: string, dayIndex = 1, date?: string) {
+      const dayDate = date || new Date().toISOString().slice(0, 10);
+      const day = this.ensureDay(tripId, dayIndex, dayDate);
       const item: DayPlanItem = { spot_id: spotId, start_time: '10:00', end_time: '12:00', note: '现场调整', transport: 'metro' };
       day.items.push(item);
       dayPlanApi.save(this.dayPlans);

@@ -7,24 +7,27 @@
     </div>
     <EmptyState v-if="!spotStore.filteredSpots.length" title="没有景点" :description="messages.emptySpots" />
     <section class="grid">
-      <SpotCard v-for="spot in spotStore.filteredSpots" :key="spot.id" :spot="spot" @favorite="spotStore.toggleFavorite" @add="addSpot" />
+      <SpotCard v-for="spot in spotStore.filteredSpots" :key="spot.id" :spot="spot" @favorite="spotStore.toggleFavorite" @add="openDialog" />
     </section>
+    <AddToTripDialog ref="dialogRef" @confirm="handleConfirm" />
   </main>
 </template>
 <script setup lang="ts">
-import { useTripStore } from '../stores/tripStore';
-import { useSpotStore } from '../stores/spotStore';
+import { ref } from 'vue';
 import { useDayPlanStore } from '../stores/dayPlanStore';
+import { useSpotStore } from '../stores/spotStore';
 import CategoryFilter from '../components/common/CategoryFilter.vue';
 import SpotCard from '../components/common/SpotCard.vue';
 import EmptyState from '../components/common/EmptyState.vue';
+import AddToTripDialog from '../components/common/AddToTripDialog.vue';
 import { messages } from '../constants/messages';
-const tripStore = useTripStore();
-const spotStore = useSpotStore();
 const dayPlanStore = useDayPlanStore();
-function addSpot(id: string) {
-  const tripId = tripStore.trips[0]?.id || tripStore.createTrip();
-  dayPlanStore.addSpot(tripId, id, 1);
+const spotStore = useSpotStore();
+const dialogRef = ref<InstanceType<typeof AddToTripDialog>>();
+function openDialog(spotId: string) {
+  dialogRef.value?.open(spotId);
+}
+function handleConfirm(tripId: string, spotId: string, dayIdx: number, date: string) {
+  dayPlanStore.addSpot(tripId, spotId, dayIdx, date);
 }
 </script>
-
